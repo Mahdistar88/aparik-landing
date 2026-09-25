@@ -27,5 +27,28 @@ section{padding:90px 0}.section-head{text-align:center;max-width:720px;margin:0 
 <div class="modal" id="modal"><div class="modal-box"><button class="close" id="close">×</button><div id="formWrap"><span class="pill">دسترسی زودهنگام</span><h2>پیش‌ثبت‌نام آپاریک</h2><div class="sub">کمتر از یک دقیقه زمان می‌برد.</div><form id="preForm"><div class="form-grid"><div class="field"><label>نام و نام خانوادگی *</label><input name="fullName" required placeholder="مثلاً مهدی محمدی"></div><div class="field"><label>شماره موبایل *</label><input name="mobile" inputmode="numeric" required placeholder="09xxxxxxxxx" pattern="09[0-9]{9}"></div><div class="field"><label>نوع کسب‌وکار *</label><select name="businessType" required><option value="">انتخاب کنید</option><option>سالن زیبایی</option><option>آرایشگاه</option><option>کلینیک / مطب</option><option>تعمیرگاه موتور</option><option>خدمات خودرو</option><option>مشاوره / آموزش</option><option>سایر</option></select></div><div class="field"><label>نام کسب‌وکار</label><input name="businessName" placeholder="اختیاری"></div></div><button class="btn primary submit" type="submit">ثبت پیش‌ثبت‌نام</button><div class="privacy">اطلاعات شما فقط برای ارتباط درباره Aparik استفاده خواهد شد.</div></form></div><div class="success" id="success"><div class="big">🎉</div><h2>خوش اومدی به جمع اولین‌های آپاریک!</h2><p><b id="successName"></b>، پیش‌ثبت‌نامت با موفقیت انجام شد.<br>تو جزو اولین کسب‌وکارهایی هستی که برای تجربه Aparik اعلام آمادگی کردی. به‌محض آماده‌شدن دسترسی اولیه، برای ادامه مسیر باهات در ارتباط خواهیم بود.</p><button class="btn primary" id="done">عالیه، منتظرم!</button></div></div></div>
 <script>
 const modal=document.getElementById('modal'),form=document.getElementById('preForm'),formWrap=document.getElementById('formWrap'),success=document.getElementById('success');document.querySelectorAll('.open-modal').forEach(b=>b.onclick=()=>modal.classList.add('show'));document.getElementById('close').onclick=()=>modal.classList.remove('show');document.getElementById('done').onclick=()=>modal.classList.remove('show');modal.addEventListener('click',e=>{if(e.target===modal)modal.classList.remove('show')});
-form.addEventListener('submit',async e=>{e.preventDefault();const data=Object.fromEntries(new FormData(form).entries());data.createdAt=new Date().toISOString();/* DEPLOY: این بخش در مرحله استقرار به API رایگان متصل می‌شود. */try{const current=JSON.parse(localStorage.getItem('aparik_preregistrations')||'[]');current.push(data);localStorage.setItem('aparik_preregistrations',JSON.stringify(current));document.getElementById('successName').textContent=data.fullName.split(' ')[0];formWrap.style.display='none';success.style.display='block';form.reset()}catch(err){alert('ثبت اطلاعات انجام نشد. لطفاً دوباره تلاش کنید.')}});
+form.addEventListener('submit',async e=>{e.preventDefault();
+const submitBtn=form.querySelector('button[type="submit"]');
+const originalText=submitBtn.textContent;
+const data=Object.fromEntries(new FormData(form).entries());
+data.createdAt=new Date().toLocaleString('fa-IR',{timeZone:'Asia/Tehran'});
+submitBtn.disabled=true;submitBtn.textContent='در حال ثبت...';
+try{
+ const response=await fetch('https://formsubmit.co/ajax/mahdistar88@gmail.com',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({
+  'نام و نام خانوادگی':data.fullName,
+  'شماره موبایل':data.mobile,
+  'نوع کسب‌وکار':data.businessType,
+  'نام کسب‌وکار':data.businessName||'—',
+  'زمان ثبت':data.createdAt,
+  '_subject':'پیش‌ثبت‌نام جدید Aparik',
+  '_template':'table',
+  '_captcha':'false'
+ })});
+ const result=await response.json().catch(()=>({}));
+ if(!response.ok || result.success===false) throw new Error(result.message||'ارسال ناموفق بود');
+ document.getElementById('successName').textContent=(data.fullName||'').trim().split(/\s+/)[0];
+ formWrap.style.display='none';success.style.display='block';form.reset();
+}catch(err){console.error(err);alert('ارسال پیش‌ثبت‌نام انجام نشد. اتصال اینترنت را بررسی کنید و دوباره تلاش کنید.');}
+finally{submitBtn.disabled=false;submitBtn.textContent=originalText;}
+});
 </script></body></html>
