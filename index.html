@@ -31,24 +31,27 @@ form.addEventListener('submit',async e=>{e.preventDefault();
 const submitBtn=form.querySelector('button[type="submit"]');
 const originalText=submitBtn.textContent;
 const data=Object.fromEntries(new FormData(form).entries());
-data.createdAt=new Date().toLocaleString('fa-IR',{timeZone:'Asia/Tehran'});
 submitBtn.disabled=true;submitBtn.textContent='در حال ثبت...';
 try{
- const response=await fetch('https://formsubmit.co/ajax/mahdistar88@gmail.com',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({
-  'نام و نام خانوادگی':data.fullName,
-  'شماره موبایل':data.mobile,
-  'نوع کسب‌وکار':data.businessType,
-  'نام کسب‌وکار':data.businessName||'—',
-  'زمان ثبت':data.createdAt,
-  '_subject':'پیش‌ثبت‌نام جدید Aparik',
-  '_template':'table',
-  '_captcha':'false'
- })});
+ const response=await fetch('https://api.aparik.ir/preregister',{
+  method:'POST',
+  headers:{'Content-Type':'application/json','Accept':'application/json'},
+  body:JSON.stringify({
+   fullName:(data.fullName||'').trim(),
+   mobile:(data.mobile||'').trim(),
+   businessType:(data.businessType||'').trim(),
+   businessName:(data.businessName||'').trim()
+  })
+ });
  const result=await response.json().catch(()=>({}));
- if(!response.ok || result.success===false) throw new Error(result.message||'ارسال ناموفق بود');
+ if(!response.ok || result.ok!==true) throw new Error(result.message||'ثبت پیش‌ثبت‌نام ناموفق بود');
  document.getElementById('successName').textContent=(data.fullName||'').trim().split(/\s+/)[0];
  formWrap.style.display='none';success.style.display='block';form.reset();
-}catch(err){console.error(err);alert('ارسال پیش‌ثبت‌نام انجام نشد. اتصال اینترنت را بررسی کنید و دوباره تلاش کنید.');}
-finally{submitBtn.disabled=false;submitBtn.textContent=originalText;}
+}catch(err){
+ console.error(err);
+ alert(err.message||'ثبت پیش‌ثبت‌نام انجام نشد. اتصال اینترنت را بررسی کنید و دوباره تلاش کنید.');
+}finally{
+ submitBtn.disabled=false;submitBtn.textContent=originalText;
+}
 });
 </script></body></html>
