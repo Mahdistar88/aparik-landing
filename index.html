@@ -33,7 +33,7 @@ const originalText=submitBtn.textContent;
 const data=Object.fromEntries(new FormData(form).entries());
 submitBtn.disabled=true;submitBtn.textContent='در حال ثبت...';
 try{
- const response=await fetch('https://api.aparik.ir/preregister',{
+ const response=await fetch('https://aparik-api.mahdistar88.workers.dev/preregister',{
   method:'POST',
   headers:{'Content-Type':'application/json','Accept':'application/json'},
   body:JSON.stringify({
