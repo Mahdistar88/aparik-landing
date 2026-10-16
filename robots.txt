@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://aparik.ir/sitemap.xml
